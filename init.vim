@@ -1,7 +1,4 @@
 set number
-if executable('ag')
-  let g:ackprg = 'ag --vimgrep'
-endif
 let g:mapleader = "\<space>"
 set nocompatible
 filetype off
@@ -25,19 +22,22 @@ Plug 'christoomey/vim-tmux-navigator'
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 
 "}}}
+Plug 'tjdevries/colorbuddy.vim'
+Plug 'tjdevries/gruvbuddy.nvim'
+
 Plug 'mileszs/ack.vim'
 "{{{
-cnoreabbrev Ack Ack!
 nnoremap <Leader>a :Ack!<Space>
 "}}}
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 " {{{
-nnoremap <silent> <leader>/ :FZF<CR>
+nnoremap <silent> <leader>/ :Files <Cr>
+nnoremap <silent>  <leader>g  :Rg <C-r><C-w><Cr>
+nnoremap <C-a> :Rg<Cr>
 " }}}
 Plug 'rust-lang/rust.vim'
 Plug 'ludovicchabant/vim-gutentags'
-Plug 'skywind3000/gutentags_plus'
 Plug 'vim-scripts/taglist.vim'
 Plug 'axelf4/vim-strip-trailing-whitespace'
 Plug 'preservim/tagbar'
@@ -98,10 +98,8 @@ require'nvim-treesitter.configs'.setup {
 EOF
 "}}}
 
-
-
-let g:tokyonight_style = "night"
-colorscheme tokyonight
+" And then somewhere in your vimrc, to set the colorscheme
+lua require('colorbuddy').colorscheme('gruvbuddy')
 map <silent> <C-n> :NERDTreeFocus<CR>
 filetype plugin indent on
 syntax on
@@ -120,7 +118,6 @@ set smartindent
 set background=dark
 set tags=tags
 set mouse=a
-set switchbuf+=usetab,newtab
 let &makeprg = 'make -s -C $WORKSPACE/modem/common/system-build/ubs -j8 PROJECT=INITIUM1 SYSTARGET=INITIUM1 NANO=YES BUILDMODE=DEBUG FTABGEN=YES'
 let g:rustfmt_autosave = 1
 " use right panel to use tag list
@@ -171,14 +168,6 @@ nnoremap <C-N> :bnext<CR>
 nnoremap <C-P> :bprev<CR>
 nnoremap <Leader>b :buffers<CR>:buffer<Space>
 
-" Use tab for trigger completion with characters ahead and navigate.
-" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
-" other plugin before putting this into your config.
-"inoremap <silent><expr> <TAB>
-"      \ pumvisible() ? "\<C-n>" :
-"      \ <SID>check_back_space() ? "\<TAB>" :
-"      \ coc#refresh()
-"inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
 function! s:check_back_space() abort
   let col = col('.') - 1
@@ -381,6 +370,7 @@ let g:gutentags_ctags_exclude = [
 
 let g:gutentags_plus_nomap = 1
 let g:gutentags_define_advanced_commands = 1
+let g:gutentags_resolve_symlinks=1
 
 " Find files using Telescope command-line sugar.
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
@@ -390,4 +380,7 @@ nnoremap <leader>fh <cmd>Telescope help_tags<cr>
 
 autocmd BufRead *.rs :setlocal tags=./rusty-tags.vi;/,$RUST_SRC_PATH/rusty-tags.vi
 autocmd BufWritePost *.rs :silent! exec "!rusty-tags vi --quiet --start-dir=" . expand('%:p:h') . "&" | redraw!
+
+set grepprg=rg\ --vimgrep
+set grepformat^=%f:%l:%c:%m
 
